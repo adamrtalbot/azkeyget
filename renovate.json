@@ -3,13 +3,14 @@
   "extends": [
     "config:recommended",
     ":dependencyDashboard",
-    ":semanticCommits",
-    ":automergeDigests",
-    ":automergeBranch"
+    ":semanticCommits"
   ],
   "rangeStrategy": "bump",
   "separateMajorMinor": true,
   "separateMinorPatch": false,
+  "digest": {
+    "automerge": true
+  },
   "dependencyDashboardTitle": "🤖 Dependency Dashboard",
   "commitMessagePrefix": "chore(deps):",
   "labels": ["dependencies"],
