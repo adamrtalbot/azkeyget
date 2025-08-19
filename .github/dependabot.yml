@@ -1,0 +1,41 @@
+version: 2
+updates:
+  - package-ecosystem: "gomod"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+    open-pull-requests-limit: 10
+    reviewers:
+      - "adamrtalbot"
+    assignees:
+      - "adamrtalbot"
+    commit-message:
+      prefix: "chore(deps)"
+      include: "scope"
+    groups:
+      azure-sdk:
+        patterns:
+          - "github.com/Azure/*"
+      dev-tools:
+        patterns:
+          - "*golangci-lint*"
+          - "*revive*"
+          - "*gocyclo*"
+          - "*go-critic*"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+    open-pull-requests-limit: 5
+    reviewers:
+      - "adamrtalbot"
+    assignees:
+      - "adamrtalbot"
+    commit-message:
+      prefix: "chore(deps)"
+      include: "scope"
