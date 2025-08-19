@@ -1,0 +1,55 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    ":dependencyDashboard",
+    ":semanticCommits",
+    ":automergeDigests",
+    ":automergeBranch"
+  ],
+  "rangeStrategy": "bump",
+  "separateMajorMinor": true,
+  "separateMinorPatch": false,
+  "dependencyDashboardTitle": "🤖 Dependency Dashboard",
+  "commitMessagePrefix": "chore(deps):",
+  "labels": ["dependencies"],
+  "assignees": ["adamrtalbot"],
+  "reviewers": ["adamrtalbot"],
+  "timezone": "UTC",
+  "schedule": ["before 6am on monday"],
+  "packageRules": [
+    {
+      "groupName": "Go modules",
+      "matchManagers": ["gomod"],
+      "separateMajorMinor": true,
+      "rangeStrategy": "bump"
+    },
+    {
+      "groupName": "GitHub Actions",
+      "matchManagers": ["github-actions"],
+      "automerge": true,
+      "separateMajorMinor": false
+    },
+    {
+      "groupName": "Azure SDK",
+      "matchPackagePatterns": ["^github.com/Azure/"],
+      "separateMajorMinor": true
+    },
+    {
+      "groupName": "Development tools",
+      "matchPackagePatterns": [
+        "golangci-lint",
+        "revive",
+        "gocyclo",
+        "go-critic"
+      ],
+      "automerge": true,
+      "separateMajorMinor": false
+    }
+  ],
+  "vulnerabilityAlerts": {
+    "enabled": true,
+    "labels": ["security"]
+  },
+  "osvVulnerabilityAlerts": true
+}
