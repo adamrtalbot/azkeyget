@@ -30,7 +30,10 @@ func cleanTestEnvironment(t *testing.T) {
 // setTestEnvironment sets environment variables for testing
 func setTestEnvironment(envVars map[string]string) {
 	for key, value := range envVars {
-		os.Setenv(key, value)
+		if err := os.Setenv(key, value); err != nil {
+			// In test context, we can panic since this is a setup failure
+			panic(err)
+		}
 	}
 }
 
@@ -68,7 +71,12 @@ func TestCLIFlags(t *testing.T) {
 	if err := buildCmd.Run(); err != nil {
 		t.Fatalf("Failed to build test binary: %v", err)
 	}
-	defer os.Remove("azkeyget_test")
+	defer func() {
+		if err := os.Remove("azkeyget_test"); err != nil {
+			// Log but don't fail test for cleanup errors
+			t.Logf("Failed to remove test binary: %v", err)
+		}
+	}()
 
 	tests := []struct {
 		name          string

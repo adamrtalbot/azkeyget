@@ -66,7 +66,9 @@ func TestGetEnvOrDefaultBool(t *testing.T) {
 
 			// Set env var if test requires it
 			if tt.envValue != "" {
-				os.Setenv(tt.envVar, tt.envValue)
+				if err := os.Setenv(tt.envVar, tt.envValue); err != nil {
+					t.Fatalf("Failed to set environment variable %s: %v", tt.envVar, err)
+				}
 			}
 
 			result := getEnvOrDefaultBool(tt.envVar, tt.defaultValue)
@@ -123,7 +125,9 @@ func TestGetEnvOrDefault(t *testing.T) {
 
 			// Set env var if test requires it
 			if tt.envValue != "" || tt.name == "environment variable empty" {
-				os.Setenv(tt.envVar, tt.envValue)
+				if err := os.Setenv(tt.envVar, tt.envValue); err != nil {
+					t.Fatalf("Failed to set environment variable %s: %v", tt.envVar, err)
+				}
 			}
 
 			result := getEnvOrDefault(tt.envVar, tt.defaultValue)
@@ -342,7 +346,9 @@ func TestEnvironmentVariableIntegration(t *testing.T) {
 
 			// Set test environment variables
 			for key, value := range tt.envVars {
-				os.Setenv(key, value)
+				if err := os.Setenv(key, value); err != nil {
+					t.Fatalf("Failed to set environment variable %s: %v", key, err)
+				}
 			}
 
 			// Test getEnvOrDefault for each variable
