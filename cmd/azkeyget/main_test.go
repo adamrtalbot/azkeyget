@@ -60,7 +60,9 @@ func TestGetEnvOrDefaultBool(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			// Clean up any existing env var
-			os.Unsetenv(tt.envVar)
+			if err := os.Unsetenv(tt.envVar); err != nil {
+				t.Fatalf("Failed to unset environment variable %s: %v", tt.envVar, err)
+			}
 
 			// Set env var if test requires it
 			if tt.envValue != "" {
@@ -74,7 +76,9 @@ func TestGetEnvOrDefaultBool(t *testing.T) {
 			}
 
 			// Clean up
-			os.Unsetenv(tt.envVar)
+			if err := os.Unsetenv(tt.envVar); err != nil {
+				t.Errorf("Failed to clean up environment variable %s: %v", tt.envVar, err)
+			}
 		})
 	}
 }
@@ -113,7 +117,9 @@ func TestGetEnvOrDefault(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			// Clean up any existing env var
-			os.Unsetenv(tt.envVar)
+			if err := os.Unsetenv(tt.envVar); err != nil {
+				t.Fatalf("Failed to unset environment variable %s: %v", tt.envVar, err)
+			}
 
 			// Set env var if test requires it
 			if tt.envValue != "" || tt.name == "environment variable empty" {
@@ -127,7 +133,9 @@ func TestGetEnvOrDefault(t *testing.T) {
 			}
 
 			// Clean up
-			os.Unsetenv(tt.envVar)
+			if err := os.Unsetenv(tt.envVar); err != nil {
+				t.Errorf("Failed to clean up environment variable %s: %v", tt.envVar, err)
+			}
 		})
 	}
 }
@@ -327,7 +335,9 @@ func TestEnvironmentVariableIntegration(t *testing.T) {
 			}
 
 			for _, envVar := range envVarsToClean {
-				os.Unsetenv(envVar)
+				if err := os.Unsetenv(envVar); err != nil {
+					t.Fatalf("Failed to unset environment variable %s: %v", envVar, err)
+				}
 			}
 
 			// Set test environment variables
@@ -360,7 +370,9 @@ func TestEnvironmentVariableIntegration(t *testing.T) {
 
 			// Clean up
 			for _, envVar := range envVarsToClean {
-				os.Unsetenv(envVar)
+				if err := os.Unsetenv(envVar); err != nil {
+					t.Errorf("Failed to clean up environment variable %s: %v", envVar, err)
+				}
 			}
 		})
 	}
