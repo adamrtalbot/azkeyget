@@ -8,13 +8,75 @@ import (
 	"testing"
 )
 
+// cleanTestEnvironment cleans all Azure environment variables for testing
+func cleanTestEnvironment(t *testing.T) {
+	envVarsToClean := []string{
+		"AZURE_KEYVAULT_URL",
+		"AZURE_KEYVAULT_SECRET_NAME",
+		"AZURE_AUTH_METHOD",
+		"AZURE_CLIENT_ID",
+		"AZURE_CLIENT_SECRET",
+		"AZURE_TENANT_ID",
+		"AZURE_USER_ASSIGNED_ID",
+	}
+
+	for _, envVar := range envVarsToClean {
+		if err := os.Unsetenv(envVar); err != nil {
+			t.Fatalf("Failed to unset environment variable %s: %v", envVar, err)
+		}
+	}
+}
+
+// setTestEnvironment sets environment variables for testing
+func setTestEnvironment(envVars map[string]string) {
+	for key, value := range envVars {
+		if err := os.Setenv(key, value); err != nil {
+			// In test context, we can panic since this is a setup failure
+			panic(err)
+		}
+	}
+}
+
+// validateHelpOutput validates that help command works correctly
+func validateHelpOutput(t *testing.T, err error, stdout, stderr string) {
+	if err != nil {
+		t.Errorf("Help command should not error, got: %v", err)
+	}
+	if !strings.Contains(stdout, "Usage:") && !strings.Contains(stderr, "Usage:") {
+		t.Errorf("Help output should contain usage information")
+	}
+}
+
+// validateErrorOutput validates error cases
+func validateErrorOutput(t *testing.T, err error, stderr, expectedError string) {
+	if err == nil {
+		t.Errorf("Expected error but command succeeded")
+		return
+	}
+	if expectedError != "" && !strings.Contains(stderr, expectedError) {
+		t.Errorf("Error output %q should contain %q", stderr, expectedError)
+	}
+}
+
+// validateSuccessOutput validates success cases
+func validateSuccessOutput(t *testing.T, err error, stderr string) {
+	if err != nil {
+		t.Errorf("Unexpected error: %v\nStderr: %s", err, stderr)
+	}
+}
+
 func TestCLIFlags(t *testing.T) {
 	// Build the binary for testing
 	buildCmd := exec.Command("go", "build", "-o", "azkeyget_test", ".")
 	if err := buildCmd.Run(); err != nil {
 		t.Fatalf("Failed to build test binary: %v", err)
 	}
-	defer os.Remove("azkeyget_test")
+	defer func() {
+		if err := os.Remove("azkeyget_test"); err != nil {
+			// Log but don't fail test for cleanup errors
+			t.Logf("Failed to remove test binary: %v", err)
+		}
+	}()
 
 	tests := []struct {
 		name          string
@@ -44,27 +106,12 @@ func TestCLIFlags(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			// Clean environment
-			envVarsToClean := []string{
-				"AZURE_KEYVAULT_URL",
-				"AZURE_KEYVAULT_SECRET_NAME",
-				"AZURE_AUTH_METHOD",
-				"AZURE_CLIENT_ID",
-				"AZURE_CLIENT_SECRET",
-				"AZURE_TENANT_ID",
-				"AZURE_USER_ASSIGNED_ID",
-			}
+			// Clean and set environment
+			cleanTestEnvironment(t)
+			setTestEnvironment(tt.envVars)
+			defer cleanTestEnvironment(t)
 
-			for _, envVar := range envVarsToClean {
-				os.Unsetenv(envVar)
-			}
-
-			// Set test environment variables
-			for key, value := range tt.envVars {
-				os.Setenv(key, value)
-			}
-
-			// Execute command with timeout to prevent hanging
+			// Execute command
 			cmd := exec.Command("./azkeyget_test", tt.args...)
 			var stdout, stderr bytes.Buffer
 			cmd.Stdout = &stdout
@@ -72,35 +119,16 @@ func TestCLIFlags(t *testing.T) {
 
 			err := cmd.Run()
 
-			if tt.name == "help flag" {
-				// Help should exit with code 0 and print usage
-				if err != nil {
-					t.Errorf("Help command should not error, got: %v", err)
-				}
-				if !strings.Contains(stdout.String(), "Usage:") && !strings.Contains(stderr.String(), "Usage:") {
-					t.Errorf("Help output should contain usage information")
-				}
-			} else {
-				// For other tests that should error on flag validation
+			// Validate output based on test case
+			switch tt.name {
+			case "help flag":
+				validateHelpOutput(t, err, stdout.String(), stderr.String())
+			default:
 				if tt.expectError {
-					if err == nil {
-						t.Errorf("Expected error but command succeeded")
-					} else if tt.errorContains != "" {
-						output := stderr.String()
-						if !strings.Contains(output, tt.errorContains) {
-							t.Errorf("Error output %q should contain %q", output, tt.errorContains)
-						}
-					}
+					validateErrorOutput(t, err, stderr.String(), tt.errorContains)
 				} else {
-					if err != nil {
-						t.Errorf("Unexpected error: %v\nStderr: %s", err, stderr.String())
-					}
+					validateSuccessOutput(t, err, stderr.String())
 				}
-			}
-
-			// Clean up environment
-			for _, envVar := range envVarsToClean {
-				os.Unsetenv(envVar)
 			}
 		})
 	}
