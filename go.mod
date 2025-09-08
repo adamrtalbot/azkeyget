@@ -11,7 +11,7 @@ require (
 	github.com/fzipp/gocyclo v0.6.0
 	github.com/go-critic/go-critic v0.13.0
 	github.com/golangci/golangci-lint v1.64.8
-	github.com/mgechev/revive v1.11.0
+	github.com/mgechev/revive v1.12.0
 	github.com/spf13/cobra v1.9.1
 	golang.org/x/tools v0.36.0
 )
