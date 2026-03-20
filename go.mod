@@ -12,7 +12,7 @@ require (
 	github.com/go-critic/go-critic v0.14.2
 	github.com/golangci/golangci-lint v1.64.8
 	github.com/mgechev/revive v1.12.0
-	github.com/spf13/cobra v1.10.1
+	github.com/spf13/cobra v1.10.2
 	golang.org/x/tools v0.40.0
 )
 
