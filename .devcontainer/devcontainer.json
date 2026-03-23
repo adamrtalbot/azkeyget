@@ -1,0 +1,24 @@
+{
+  "name": "azkeyget",
+  "image": "mcr.microsoft.com/devcontainers/go:1.24",
+  "features": {
+    "ghcr.io/devcontainers/features/azure-cli:1": {},
+    "ghcr.io/devcontainers/features/github-cli:1": {}
+  },
+  "postCreateCommand": "go mod download && make install-tools && pre-commit install",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "golang.go",
+        "github.vscode-github-actions",
+        "ms-azuretools.vscode-azureresourcegroups",
+        "EditorConfig.EditorConfig"
+      ],
+      "settings": {
+        "go.lintTool": "golangci-lint",
+        "go.lintFlags": ["--fast"],
+        "go.testFlags": ["-v"]
+      }
+    }
+  }
+}
