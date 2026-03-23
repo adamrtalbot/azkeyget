@@ -1,11 +1,12 @@
 {
   "name": "azkeyget",
-  "image": "mcr.microsoft.com/devcontainers/go:1.24",
+  "image": "mcr.microsoft.com/devcontainers/go:1.25",
   "features": {
     "ghcr.io/devcontainers/features/azure-cli:1": {},
-    "ghcr.io/devcontainers/features/github-cli:1": {}
+    "ghcr.io/devcontainers/features/github-cli:1": {},
+    "ghcr.io/devcontainers/features/python:1": {}
   },
-  "postCreateCommand": "go mod download && make install-tools && pre-commit install",
+  "postCreateCommand": "go mod download && make install-tools && pip install pre-commit && pre-commit install",
   "customizations": {
     "vscode": {
       "extensions": [
